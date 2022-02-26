@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -41,13 +44,16 @@ public class PokemonService {
     @Value("${poke.api.url}")
     private String pokeApiUrl;
 
+    @Value("${poke.api.size}")
+    private Integer listSize;
+
     public void fetchPokemon() {
 
         LOGGER.debug("Fetching Pokemon - START");
 
         Pokemon pokemon;
         PokemonDTO pokemonDTO;
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= listSize; i++) {
 
             pokemonDTO = restTemplate.getForObject(pokeApiUrl + i, PokemonDTO.class);
 
@@ -97,6 +103,18 @@ public class PokemonService {
 
     public List<Pokemon> getPokemons() {
         return pokemonRepository.findAll();
+    }
+
+    public List<Pokemon> getPokemonsPage(Integer page, Integer size) {
+
+        Pageable paging = PageRequest.of(page, size);
+        Page<Pokemon> pagedResult = pokemonRepository.findAll(paging);
+
+        if(pagedResult.hasContent()) {
+            return pagedResult.getContent();
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public Pokemon getPokemon(Integer id) {

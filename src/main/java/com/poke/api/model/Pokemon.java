@@ -16,7 +16,10 @@ public class Pokemon {
 
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator="sqlite")
+    @TableGenerator(name="sqlite", table="sqlite_sequence",
+            pkColumnName="name", valueColumnName="seq",
+            pkColumnValue="pokemon")
     private Integer id;
 
     @Column(name = "name")
