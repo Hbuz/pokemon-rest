@@ -3,12 +3,14 @@ package com.poke.api.service;
 import com.poke.api.dto.MoveElem;
 import com.poke.api.dto.PokemonDTO;
 import com.poke.api.dto.TypeElem;
+import com.poke.api.handler.RestTemplateResponseErrorHandler;
 import com.poke.api.model.Pokemon;
 import com.poke.api.repository.PokemonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -28,9 +30,12 @@ public class PokemonService {
 
     private final PokemonRepository pokemonRepository;
 
+    private RestTemplate restTemplate;
+
     @Autowired
-    public PokemonService(PokemonRepository pokemonRepository) {
+    public PokemonService(PokemonRepository pokemonRepository, RestTemplateBuilder restTemplateBuilder) {
         this.pokemonRepository = pokemonRepository;
+        this.restTemplate = restTemplateBuilder.errorHandler(new RestTemplateResponseErrorHandler()).build();
     }
 
     @Value("${poke.api.url}")
@@ -40,18 +45,11 @@ public class PokemonService {
 
         LOGGER.debug("Fetching Pokemon - START");
 
-        RestTemplate restTemplate = new RestTemplate();
-
         Pokemon pokemon;
         PokemonDTO pokemonDTO;
         for (int i = 1; i <= 2; i++) {
 
-            try {
-                pokemonDTO = restTemplate.getForObject(pokeApiUrl + i, PokemonDTO.class);
-            } catch (Exception e) {
-                LOGGER.error("There was an error fetching from the PokeAPI. Message:{}", e.getMessage());
-                throw e;
-            }
+            pokemonDTO = restTemplate.getForObject(pokeApiUrl + i, PokemonDTO.class);
 
             pokemon = new Pokemon();
             pokemon.setName(StringUtils.capitalize(pokemonDTO.getName()));
