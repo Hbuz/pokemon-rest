@@ -8,7 +8,9 @@ import com.poke.api.repository.PokemonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
@@ -31,35 +33,47 @@ public class PokemonService {
         this.pokemonRepository = pokemonRepository;
     }
 
+    @Value("${poke.api.url}")
+    private String pokeApiUrl;
+
     public void fetchPokemon() {
 
-        LOGGER.info("Fetching Pokemon - START");
+        LOGGER.debug("Fetching Pokemon - START");
 
         RestTemplate restTemplate = new RestTemplate();
 
         Pokemon pokemon;
         PokemonDTO pokemonDTO;
         for (int i = 1; i <= 2; i++) {
-            pokemonDTO = restTemplate.getForObject("https://pokeapi.co/api/v2/pokemon/"+i, PokemonDTO.class);
+
+            try {
+                pokemonDTO = restTemplate.getForObject(pokeApiUrl + i, PokemonDTO.class);
+            } catch (Exception e) {
+                LOGGER.error("There was an error fetching from the PokeAPI. Message:{}", e.getMessage());
+                throw e;
+            }
 
             pokemon = new Pokemon();
-            pokemon.setName(pokemonDTO.getName());
+            pokemon.setName(StringUtils.capitalize(pokemonDTO.getName()));
             pokemon.setWeight(getRoundedDecimal(pokemonDTO.getWeight(), 3));
             pokemon.setHeight(getRoundedDecimal(pokemonDTO.getHeight(), 2));
             pokemon.setMoves(getMoves(pokemonDTO).toString());
             pokemon.setTypes(getTypes(pokemonDTO).toString());
+            try {
+                pokemonRepository.save(pokemon);
+            } catch (Exception e) {
+                LOGGER.error("There was an error storing on DB the pokemon:{}. Message:{}", pokemon, e.getMessage());
+            }
 
-            pokemonRepository.save(pokemon);
-
-            LOGGER.info("Added pokemon - {}", pokemon);
+            LOGGER.debug("Added pokemon - {}", pokemon);
         }
 
-        LOGGER.info("Fetching Pokemon - FINISHED");
+        LOGGER.debug("Fetching Pokemon - FINISHED");
     }
 
     private List<String> getTypes(PokemonDTO pokemonDTO) {
         List<String> types = new ArrayList<>();
-        for (TypeElem typeElem: pokemonDTO.getTypes()) {
+        for (TypeElem typeElem : pokemonDTO.getTypes()) {
             types.add(typeElem.getType().getName());
         }
         return types;
@@ -68,7 +82,7 @@ public class PokemonService {
     private List<String> getMoves(PokemonDTO pokemonDTO) {
         List<String> moves = new ArrayList<>();
         int moveCounter = 0;
-        for (MoveElem moveElem: pokemonDTO.getMoves()) {
+        for (MoveElem moveElem : pokemonDTO.getMoves()) {
             if (moveCounter < 4) {
                 moves.add(moveElem.getMove().getName());
                 moveCounter++;
@@ -84,12 +98,14 @@ public class PokemonService {
     }
 
     public List<Pokemon> getPokemons() {
-        List<Pokemon> pokemons = pokemonRepository.findAll();
-        return pokemons;
+        return pokemonRepository.findAll();
     }
 
     public Pokemon getPokemon(Integer id) {
         Optional<Pokemon> pokemon = pokemonRepository.findById(id);
-        return pokemon.get();
+        if (pokemon.isPresent()) {
+            return pokemon.get();
+        }
+        return null;
     }
 }
