@@ -1,14 +1,11 @@
 # pokemon-rest
-Small application that retrieve a list 0f 500 Pokémons from the PokéAPI and store them in a database. <br/>
+This is a small application that retrieves a list 0f 500 Pokémons from the PokéAPI and stores them in a database.
 The list can be retrieved with HTTP endpoints including the pagination.
 
 #### NOTE:
-The Pokémon list is retrieved and stored into the DB when the application starts through a runner process, and given that there are 500 element to fetch,
-it could take a bit while.
+The Pokémon list is retrieved and stored into the DB when the application starts through a runner process, and given that there are 500 elements to fetch, it could take a bit while.
 
 The DB table is also cleared before every restart of the application.
-
-
 
 ## Getting Started
 
