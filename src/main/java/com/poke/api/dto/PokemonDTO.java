@@ -15,7 +15,7 @@ public class PokemonDTO {
 
     private Double height;
 
-    private List<MoveElem> moves;
+    private List<MoveElemDTO> moves;
 
-    private List<TypeElem> types;
+    private List<TypeElemDTO> types;
 }

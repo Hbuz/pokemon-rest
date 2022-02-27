@@ -7,7 +7,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class TypeObj {
+public class MoveObjDTO {
 
     private String name;
 }
