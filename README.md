@@ -52,7 +52,7 @@ GET - http://localhost:8080/api/pokemons
 ```
 - CURL:
 `
-curl -X GET "http://localhost:8080/api/pokemons" -H "accept: */*"
+curl -X GET "http://localhost:8080/api/pokemons/all" -H "accept: */*"
 `
 
 <br/><br/>
