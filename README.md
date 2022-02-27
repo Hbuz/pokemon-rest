@@ -26,34 +26,52 @@ The DB table is also cleared before that.
 git clone git@github.com:Hbuz/pokemon-rest.git
 ```
 
-* Creating an executable JAR
-Execute this command from the root of the project:
+* Go to root project
 ```
-mvn install
+cd pokemon-rest
+```
+
+* Change folder mode
+```
+chmod +x mvnw
+```
+
+* Creating an executable JAR
+Execute this command from the root project:
+```
+./mvnw package
 ```
 
 ### Run the application
-Execute this command from the root of the project:
+Execute this command from the root project:
 ```
-mvn spring-boot:run
-```
-or as a packaged jar application
-```
-java -jar target/api-0.0.1-SNAPSHOT.jar
+java -jar target/*.jar
 ```
 
 ### Endpoints implemented
-* Get all Pokémons
+1. Get all Pokémons
 ```
 GET - http://localhost:8080/api/pokemons
 ```
+- CURL:
+```
+curl -X GET "http://localhost:8080/api/pokemons" -H "accept: */*"
+```
 
-* Get all Pokémons with Pagination. (This is an example of the first page with 10 Pokémons)
+2. Get all Pokémons with Pagination. (This is an example of the first page with 10 Pokémons)
 ```
 GET - http://localhost:8080/api/pokemons?page=0&size=10
 ```
+- CURL:
+```
+curl -X GET "http://localhost:8080/api/pokemons?page=0&size=10" -H "accept: */*"
+```
 
-* Find a specific Pokémon by the Id. (Implemented for testing)
+3. Find a specific Pokémon by the Id. (Implemented for testing)
 ```
 GET - http://localhost:8080/api/pokemons/{id}
+```
+- CURL:
+```
+curl -X GET "http://localhost:8080/api/pokemons/1" -H "accept: */*"
 ```
