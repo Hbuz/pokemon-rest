@@ -1,8 +1,8 @@
 package com.poke.api.service;
 
-import com.poke.api.dto.MoveElem;
+import com.poke.api.dto.MoveElemDTO;
 import com.poke.api.dto.PokemonDTO;
-import com.poke.api.dto.TypeElem;
+import com.poke.api.dto.TypeElemDTO;
 import com.poke.api.handler.RestTemplateResponseErrorHandler;
 import com.poke.api.model.Pokemon;
 import com.poke.api.repository.PokemonRepository;
@@ -38,7 +38,9 @@ public class PokemonService {
     @Autowired
     public PokemonService(PokemonRepository pokemonRepository, RestTemplateBuilder restTemplateBuilder) {
         this.pokemonRepository = pokemonRepository;
-        this.restTemplate = restTemplateBuilder.errorHandler(new RestTemplateResponseErrorHandler()).build();
+        this.restTemplate = restTemplateBuilder
+                .errorHandler(new RestTemplateResponseErrorHandler())
+                .build();
     }
 
     @Value("${poke.api.url}")
@@ -63,13 +65,14 @@ public class PokemonService {
             pokemon.setHeight(getRoundedDecimal(pokemonDTO.getHeight(), 2));
             pokemon.setMoves(getMoves(pokemonDTO).toString());
             pokemon.setTypes(getTypes(pokemonDTO).toString());
+
             try {
                 pokemonRepository.save(pokemon);
+                LOGGER.debug("Added pokemon - {}", pokemon);
+
             } catch (Exception e) {
                 LOGGER.error("There was an error storing on DB the pokemon:{}. Message:{}", pokemon, e.getMessage());
             }
-
-            LOGGER.debug("Added pokemon - {}", pokemon);
         }
 
         LOGGER.debug("Fetching Pokemon - FINISHED");
@@ -77,18 +80,20 @@ public class PokemonService {
 
     private List<String> getTypes(PokemonDTO pokemonDTO) {
         List<String> types = new ArrayList<>();
-        for (TypeElem typeElem : pokemonDTO.getTypes()) {
-            types.add(typeElem.getType().getName());
+
+        for (TypeElemDTO typeElemDTO : pokemonDTO.getTypes()) {
+            types.add(typeElemDTO.getType().getName());
         }
         return types;
     }
 
     private List<String> getMoves(PokemonDTO pokemonDTO) {
         List<String> moves = new ArrayList<>();
+
         int moveCounter = 0;
-        for (MoveElem moveElem : pokemonDTO.getMoves()) {
+        for (MoveElemDTO moveElemDTO : pokemonDTO.getMoves()) {
             if (moveCounter < 4) {
-                moves.add(moveElem.getMove().getName());
+                moves.add(moveElemDTO.getMove().getName());
                 moveCounter++;
             } else {
                 break;
@@ -98,7 +103,9 @@ public class PokemonService {
     }
 
     private Double getRoundedDecimal(Double value, Integer places) {
-        return new BigDecimal(value).setScale(places, RoundingMode.HALF_UP).doubleValue();
+        return new BigDecimal(value)
+                .setScale(places, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     public List<Pokemon> getPokemons() {
@@ -110,11 +117,10 @@ public class PokemonService {
         Pageable paging = PageRequest.of(page, size);
         Page<Pokemon> pagedResult = pokemonRepository.findAll(paging);
 
-        if(pagedResult.hasContent()) {
+        if (pagedResult.hasContent()) {
             return pagedResult.getContent();
-        } else {
-            return new ArrayList<>();
         }
+        return new ArrayList<>();
     }
 
     public Pokemon getPokemon(Integer id) {
