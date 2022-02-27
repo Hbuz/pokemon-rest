@@ -74,3 +74,9 @@ GET - http://localhost:8080/api/pokemons/{id}
 `
 curl -X GET "http://localhost:8080/api/pokemons/1" -H "accept: */*"
 `
+
+### Postman
+A postman collection has been added to the root project. It can be imported and used in Postman to test the application: 
+
+```pokemon API.postman_collection.json```
+
