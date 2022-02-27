@@ -54,24 +54,26 @@ java -jar target/*.jar
 GET - http://localhost:8080/api/pokemons
 ```
 - CURL:
-```
+`
 curl -X GET "http://localhost:8080/api/pokemons" -H "accept: */*"
-```
+`
 
+<br/><br/>
 2. Get all Pokémons with Pagination. (This is an example of the first page with 10 Pokémons)
 ```
 GET - http://localhost:8080/api/pokemons?page=0&size=10
 ```
 - CURL:
-```
+`
 curl -X GET "http://localhost:8080/api/pokemons?page=0&size=10" -H "accept: */*"
-```
+`
 
+<br/><br/>
 3. Find a specific Pokémon by the Id. (Implemented for testing)
 ```
 GET - http://localhost:8080/api/pokemons/{id}
 ```
 - CURL:
-```
+`
 curl -X GET "http://localhost:8080/api/pokemons/1" -H "accept: */*"
-```
+`
