@@ -39,7 +39,7 @@ mvn spring-boot:run
 ```
 or as a packaged jar application
 ```
-java -jar target/myapplication-0.0.1-SNAPSHOT.jar
+java -jar target/api-0.0.1-SNAPSHOT.jar
 ```
 
 ### Endpoints implemented
